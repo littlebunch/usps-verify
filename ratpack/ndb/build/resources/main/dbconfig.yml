@@ -1,0 +1,5 @@
+database:
+  host	: localhost
+  url : jdbc:mariadb://localhost:3306/ndl
+  driver : org.mariadb.jdbc.Driver
+  dataSourceClass : org.mariadb.jdbc.MySQLDataSource
