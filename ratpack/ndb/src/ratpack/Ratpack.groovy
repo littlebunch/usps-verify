@@ -38,7 +38,7 @@ ratpack {
     bindInstance UnitsService, new DefaultUnitsService()
 
     bindInstance JsonSlurper, new JsonSlurper()
-
+    // add GORM to the Registry
     moduleConfig(GormModule,appConfig)
 
     bindInstance new Service() {
@@ -48,6 +48,7 @@ ratpack {
             Units.withNewSession {
                 new Units(unit:"g").save()
                 new Units(unit:"lb").save()
+                new Units(unit:"ml").save()
             }
           }
         }
@@ -63,15 +64,24 @@ ratpack {
         }.map { data->
           new Units(data)
         }.flatMap { user ->
-          unitsService.save(unit)
+          UnitsService.save(unit)
         }.then {
           response.send()
         }
       }
 
         get {
-         unitsService.getUnits().then { units->
+         /*UnitsService.getUnits().then { units->
               response.send(toJson(units))
+          }*/
+          Blocking.get {
+            Units.withNewSession {
+              Units.list().collect{ u->
+                [id:u.id,version:u.version,unit:u.unit]
+              }
+            }
+          } then { unitsList ->
+              rendor toJson(unitsList.toString())
           }
         }
       }
