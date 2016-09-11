@@ -9,7 +9,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource
 import gov.usda.nal.ndb.model.Units
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
+/**
+* Creates a HikariDataSoure in the GORM context
+*/
 class GormModule extends ConfigurableModule<app.ApplicationConfig> {
   @Override
   protected void configure()
@@ -41,21 +43,30 @@ class GormModule extends ConfigurableModule<app.ApplicationConfig> {
 </beans:bean>*/
   @Provides
   @Singleton
-  DataSource dataSource(GenericApplicationContext appCtx, app.ApplicationConfig appConfig)
+  /*DriverManagerDataSource dataSource(GenericApplicationContext appCtx, app.ApplicationConfig appConfig)
   {
-    DataSource dataSource=new HikariDataSource(new HikariConfig(dataSourceClassName:appConfig.database.dataSourceClass,
+    def dataSource=new DriverManagerDataSource(appConfig.database.url,appConfig.database.user,appConfig.database.password)
+    dataSource.driverClassName=appConfig.database.driver
+    appCtx.beanFactory.registerSingleton 'dataSource', dataSource
+    dataSource
+  }*/
+  HikariDataSource dataSource(GenericApplicationContext appCtx, app.ApplicationConfig appConfig)
+  {
+    HikariDataSource datasource=new HikariDataSource(new HikariConfig(/*dataSourceClassName:appConfig.database.dataSourceClass,*/
                               jdbcUrl:appConfig.database.url,
                               username:appConfig.database.user,
-                              password:appConfig.database.password))
-    appCtx.beanFactory.registerSingleton('dataSource', dataSource)
-    dataSource
+                              password:appConfig.database.password,
+                              driverClassName:appConfig.database.driver))
+    appCtx.beanFactory.registerSingleton 'dataSource', datasource
+    datasource
   }
   @Provides
   @Singleton
-  HibernateDatastoreSpringInitializer initializer(DataSource ds,GenericApplicationContext appCtx) {
+  HibernateDatastoreSpringInitializer initializer(HikariDataSource dataSource,GenericApplicationContext appCtx) {
     def datastoreInitializer = new HibernateDatastoreSpringInitializer(Units)
     datastoreInitializer.configureForBeanDefinitionRegistry(appCtx)
-    appCtx.refresh
+  //  datastoreInitializer.configureForDataSource(dataSource)
+    appCtx.refresh()
     datastoreInitializer
   }
 }
