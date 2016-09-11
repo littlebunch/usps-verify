@@ -34,11 +34,12 @@ import org.grails.datastore.gorm.GormEntity
 
 
 class Units implements GormEntity<Units> {
+	Long id
+	Long version
 	String unit
 	Date lastUpdated
 //	static hasMany=[nutrients:Nutrients]
     static constraints = {
-
+			unit blank:false
     }
-	static mapping = {	}
 }
