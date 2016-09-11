@@ -30,7 +30,7 @@ dependencies {
   compile('org.grails:grails-spring:3.0.9') {
     exclude module: 'groovy'
   }
-  compile('org.grails:grails-datastore-gorm-hibernate4:5.0.0.RELEASE') {
+  compile('org.grails:grails-datastore-gorm-hibernate4:5.0.10.RELEASE') {
     exclude module: 'groovy '
   }
 }
