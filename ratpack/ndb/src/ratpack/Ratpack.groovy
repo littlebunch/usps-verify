@@ -46,9 +46,10 @@ ratpack {
           e.getRegistry().get(HibernateDatastoreSpringInitializer)
           Blocking.exec {
             Units.withNewSession {
-                new Units(unit:"g").save()
-                new Units(unit:"lb").save()
-                new Units(unit:"ml").save()
+              Units.findOrSaveWhere(unit:'g')
+              Units.findOrSaveWhere(unit:'lb')
+              Units.findOrSaveWhere(unit:'gal')
+              Units.findOrSaveWhere(unit:'ml' )
             }
           }
         }
@@ -76,12 +77,12 @@ ratpack {
           }*/
           Blocking.get {
             Units.withNewSession {
-              Units.list().collect{ u->
-                [id:u.id,version:u.version,unit:u.unit]
+              Units.list().collect { u->
+                [version:u.version,unit:u.unit]
               }
             }
           } then { unitsList ->
-              rendor toJson(unitsList.toString())
+               render toJson(unitsList)//toJson(unitsList)
           }
         }
       }
