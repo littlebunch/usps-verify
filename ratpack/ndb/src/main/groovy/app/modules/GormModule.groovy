@@ -43,13 +43,6 @@ class GormModule extends ConfigurableModule<app.ApplicationConfig> {
 </beans:bean>*/
   @Provides
   @Singleton
-  /*DriverManagerDataSource dataSource(GenericApplicationContext appCtx, app.ApplicationConfig appConfig)
-  {
-    def dataSource=new DriverManagerDataSource(appConfig.database.url,appConfig.database.user,appConfig.database.password)
-    dataSource.driverClassName=appConfig.database.driver
-    appCtx.beanFactory.registerSingleton 'dataSource', dataSource
-    dataSource
-  }*/
   HikariDataSource dataSource(GenericApplicationContext appCtx, app.ApplicationConfig appConfig)
   {
     HikariDataSource datasource=new HikariDataSource(new HikariConfig(/*dataSourceClassName:appConfig.database.dataSourceClass,*/
@@ -65,7 +58,6 @@ class GormModule extends ConfigurableModule<app.ApplicationConfig> {
   HibernateDatastoreSpringInitializer initializer(HikariDataSource dataSource,GenericApplicationContext appCtx) {
     def datastoreInitializer = new HibernateDatastoreSpringInitializer(Units)
     datastoreInitializer.configureForBeanDefinitionRegistry(appCtx)
-  //  datastoreInitializer.configureForDataSource(dataSource)
     appCtx.refresh()
     datastoreInitializer
   }
