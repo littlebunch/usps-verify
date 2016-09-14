@@ -38,7 +38,7 @@ ratpack {
     bindInstance UnitsService, new DefaultUnitsService()
 
     bindInstance JsonSlurper, new JsonSlurper()
-
+    // add GORM to the Registry
     moduleConfig(GormModule,appConfig)
 
     bindInstance new Service() {
@@ -46,8 +46,10 @@ ratpack {
           e.getRegistry().get(HibernateDatastoreSpringInitializer)
           Blocking.exec {
             Units.withNewSession {
-                new Units(unit:"g").save()
-                new Units(unit:"lb").save()
+              Units.findOrSaveWhere(unit:'g')
+              Units.findOrSaveWhere(unit:'lb')
+              Units.findOrSaveWhere(unit:'gal')
+              Units.findOrSaveWhere(unit:'ml' )
             }
           }
         }
@@ -63,15 +65,24 @@ ratpack {
         }.map { data->
           new Units(data)
         }.flatMap { user ->
-          unitsService.save(unit)
+          UnitsService.save(unit)
         }.then {
           response.send()
         }
       }
 
         get {
-         unitsService.getUnits().then { units->
+         /*UnitsService.getUnits().then { units->
               response.send(toJson(units))
+          }*/
+          Blocking.get {
+            Units.withNewSession {
+              Units.list().collect { u->
+                [version:u.version,unit:u.unit]
+              }
+            }
+          } then { unitsList ->
+               render unitsList //toJson(unitsList)
           }
         }
       }
