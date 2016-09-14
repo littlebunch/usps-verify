@@ -10,6 +10,6 @@ class DefaultUnitsService implements UnitsService {
     Promise.sync{null}
   }
   Promise<List<Units>> getUnits() {
-    Promise.sync{storage}
+    Promise.sync{Units.list()}
   }
 }
