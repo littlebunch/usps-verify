@@ -30,10 +30,10 @@ package gov.usda.nal.ndb.model
 
 import java.util.Date;
 import java.sql.Timestamp;
-import org.grails.datastore.gorm.GormEntity
+import app.RatpackGormEntity
 
 
-class Units implements GormEntity<Units> {
+class Units implements RatpackGormEntity<Units> {
 	Long id
 	Long version
 	String unit
