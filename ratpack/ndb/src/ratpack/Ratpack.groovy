@@ -35,57 +35,54 @@ ratpack {
       }
     }
     module MarkupTemplateModule
+
+    // add GORM to the Registry
+    moduleConfig(GormModule,appConfig)
     bindInstance UnitsService, new DefaultUnitsService()
 
     bindInstance JsonSlurper, new JsonSlurper()
-    // add GORM to the Registry
-    moduleConfig(GormModule,appConfig)
-
     bindInstance new Service() {
       void onStart(StartEvent e) throws Exception {
           e.getRegistry().get(HibernateDatastoreSpringInitializer)
-          Blocking.exec {
             Units.withNewSession {
               Units.findOrSaveWhere(unit:'g')
               Units.findOrSaveWhere(unit:'lb')
               Units.findOrSaveWhere(unit:'gal')
               Units.findOrSaveWhere(unit:'ml' )
-            }
           }
         }
       }
   }
 
   handlers {
-    path('api') {JsonSlurper jsonSlurper, UnitsService userService ->
+    path('api') {JsonSlurper jsonSlurper, UnitsService unitsService ->
       byMethod {
         post {
           request.body.map {body ->
             jsonSlurper.parseText(body.text) as Map
         }.map { data->
           new Units(data)
-        }.flatMap { user ->
+        }.flatMap { unit ->
           UnitsService.save(unit)
         }.then {
           response.send()
         }
       }
-
-        get {
-         /*UnitsService.getUnits().then { units->
-              response.send(toJson(units))
-          }*/
-          Blocking.get {
-            Units.withNewSession {
-              Units.list().collect { u->
-                [version:u.version,unit:u.unit]
-              }
-            }
-          } then { unitsList ->
-               render toJson(unitsList)//toJson(unitsList)
-          }
+      get {
+        unitsService.getUnits().then { u ->
+          response.contentType("application/json")
+          response.send(toJson(u))
         }
+        response.status(400)
       }
+      }
+    }
+    get("units") {
+      UnitsService.getUnits().collect { u ->
+        [id:u.id,version:u.version,unit:u.unit]
+        println u
+      }
+
     }
     get("config")
     {
