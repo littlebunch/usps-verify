@@ -22,7 +22,7 @@
 *
 *===========================================================================
 */
-package gov.usda.nal.ndl
+package gov.usda.nal.ndb.model
 /**
  * @version $Id: FootNote.groovy 1525 2011-06-05 13:28:35Z  $
  * @author gmoore
@@ -32,7 +32,7 @@ import java.util.Date;
 import java.sql.Timestamp;
 import app.RatpackGormEntity
 
-class FootNote extends RatpackGormEntity<FootNote>{
+class FootNote implements  RatpackGormEntity<FootNote>{
 	String fnId
 	String fnType
 	String fnText

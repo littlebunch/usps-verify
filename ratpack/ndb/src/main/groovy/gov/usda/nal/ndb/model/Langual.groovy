@@ -22,7 +22,7 @@
 *
 *===========================================================================
 */
-package gov.usda.nal.ndl
+package gov.usda.nal.ndb.model
 
 import java.util.Date;
 import java.sql.Timestamp;
@@ -34,7 +34,7 @@ import app.RatpackGormEntity
 
 
 
-class Langual extends RatpackGormEntity<Langual>{
+class Langual implements  RatpackGormEntity<Langual>{
 	String code
 	String description
 	Date lastUpdated

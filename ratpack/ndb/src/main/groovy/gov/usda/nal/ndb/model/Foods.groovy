@@ -22,20 +22,20 @@
 *
 *===========================================================================
 */
-package gov.usda.nal.ndl
+package gov.usda.nal.ndb.model
 
 import app.RatpackGormEntity
 import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
-import gov.usda.nal.ndl.Source
+import gov.usda.nal.ndb.Source
 
 /**
 * @author gmoore
 * @version $Id: Foods.groovy 1836 2011-09-01 20:35:37Z  $
 */
 
-class Foods extends RatpackGormEntity<Foods> {
+class Foods implements  RatpackGormEntity<Foods> {
 	String ndbNo
 	String description
 	String shortDescription

@@ -22,7 +22,7 @@
 *
 *===========================================================================
 */
-package gov.usda.nal.ndl
+package gov.usda.nal.ndb.model
 /**
 * @author gmoore
 * @version $Id: Manufacturer.groovy 1450 2011-05-20 23:27:48Z  $
@@ -32,7 +32,7 @@ package gov.usda.nal.ndl
 import java.util.Date
 import java.sql.Timestamp
 import app.RatpackGormEntity
-class Manufacturer extends RatpackGormEntity<Manufacturer {
+class Manufacturer implements  RatpackGormEntity<Manufacturer> {
 	String name
 	Date lastUpdated
 	static hasMany=[foods:Foods]

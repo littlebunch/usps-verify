@@ -22,7 +22,7 @@
 *
 *===========================================================================
 */
-package gov.usda.nal.ndl
+package gov.usda.nal.ndb.model
 /**
  * @version $Id: Weights.groovy 1456 2011-05-24 11:36:00Z  $
  * @author gmoore
@@ -33,7 +33,7 @@ import java.util.Date;
 import java.sql.Timestamp;
 import app.RatpackGormEntity
 
-class Weights extends RatpackGormEntity<Weights> {
+class Weights implements RatpackGormEntity<Weights> {
 
 	Integer seq
 	Double amount
