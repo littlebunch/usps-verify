@@ -30,15 +30,15 @@ package gov.usda.nal.ndb.model
 
 import java.util.Date;
 import java.sql.Timestamp;
+import org.grails.datastore.gorm.GormEntity
 import app.RatpackGormEntity
 
 
-class Units implements RatpackGormEntity<Units> {
-	Long id
-	Long version
+class Units implements GormEntity<Units> {
+	Long id,version
 	String unit
 	Date lastUpdated
-//	static hasMany=[nutrients:Nutrients]
+	static hasMany=[nutrients:Nutrients]
     static constraints = {
 			unit blank:false
     }

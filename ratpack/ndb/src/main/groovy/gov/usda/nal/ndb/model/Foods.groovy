@@ -36,6 +36,8 @@ import gov.usda.nal.ndb.Source
 */
 
 class Foods implements  RatpackGormEntity<Foods> {
+	Long id
+  Long version
 	String ndbNo
 	String description
 	String shortDescription

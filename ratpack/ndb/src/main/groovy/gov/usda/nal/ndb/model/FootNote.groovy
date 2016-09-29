@@ -33,6 +33,7 @@ import java.sql.Timestamp;
 import app.RatpackGormEntity
 
 class FootNote implements  RatpackGormEntity<FootNote>{
+	Long id,version
 	String fnId
 	String fnType
 	String fnText

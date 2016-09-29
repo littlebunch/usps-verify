@@ -26,20 +26,21 @@ package gov.usda.nal.ndb.model
 
 import java.util.Date;
 import java.sql.Timestamp;
-
+import org.grails.datastore.gorm.GormEntity
 import app.RatpackGormEntity
 /**
 * @author gmoore
 * @version $Id: FoodGroups.groovy 1465 2011-05-24 20:54:30Z  $
 */
-class FoodGroups implements RatpackGormEntity<FoodGroups> {
-	String cd
-	String description
+class FoodGroups implements GormEntity<FoodGroups> {
+	Long id, version
+	String cd,description
 	Date lastUpdated
 
 	static hasMany=[foods:Foods]
     static constraints = {
-
+				cd blank:false
+				description blank:false
     }
 	static mapping = {
 
