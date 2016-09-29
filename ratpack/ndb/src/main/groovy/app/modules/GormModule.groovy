@@ -7,6 +7,9 @@ import grails.orm.bootstrap.HibernateDatastoreSpringInitializer
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.jdbc.datasource.DriverManagerDataSource
 import gov.usda.nal.ndb.model.Units
+import gov.usda.nal.ndb.model.User
+import gov.usda.nal.ndb.model.Foods
+import gov.usda.nal.ndb.model.FoodGroups
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 /**
@@ -56,7 +59,9 @@ class GormModule extends ConfigurableModule<app.ApplicationConfig> {
   @Provides
   @Singleton
   HibernateDatastoreSpringInitializer initializer(HikariDataSource dataSource,GenericApplicationContext appCtx) {
-    def datastoreInitializer = new HibernateDatastoreSpringInitializer(Units)
+    def datastoreInitializer = new HibernateDatastoreSpringInitializer([Units,Foods,FoodGroups,User])
+    //  def datastoreInitializer = new HibernateDatastoreSpringInitializer(FoodGroups)
+    //    def datastoreInitializer = new HibernateDatastoreSpringInitializer(User)
     datastoreInitializer.configureForBeanDefinitionRegistry(appCtx)
     appCtx.refresh()
     datastoreInitializer
