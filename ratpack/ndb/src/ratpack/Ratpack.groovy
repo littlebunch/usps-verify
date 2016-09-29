@@ -11,8 +11,11 @@ import ratpack.service.Service
 import ratpack.service.StartEvent
 import grails.orm.bootstrap.HibernateDatastoreSpringInitializer
 import gov.usda.nal.ndb.model.Units
+import gov.usda.nal.ndb.model.FoodGroups
 import gov.usda.nal.ndb.UnitsService
+import gov.usda.nal.ndb.model.Units
 import gov.usda.nal.ndb.DefaultUnitsService
+import gov.usda.nal.ndb.DbBootStrapService
 import groovy.json.JsonSlurper
 import app.ApplicationConfig
 import app.modules.GormModule
@@ -35,23 +38,20 @@ ratpack {
       }
     }
     module MarkupTemplateModule
-
     // add GORM to the Registry
     moduleConfig(GormModule,appConfig)
     bindInstance UnitsService, new DefaultUnitsService()
 
     bindInstance JsonSlurper, new JsonSlurper()
+    bind DbBootStrapService
     bindInstance new Service() {
       void onStart(StartEvent e) throws Exception {
-          e.getRegistry().get(HibernateDatastoreSpringInitializer)
-            Units.withNewSession {
-              Units.findOrSaveWhere(unit:'g')
-              Units.findOrSaveWhere(unit:'lb')
-              Units.findOrSaveWhere(unit:'gal')
-              Units.findOrSaveWhere(unit:'ml' )
-          }
+        e.getRegistry().get(HibernateDatastoreSpringInitializer)
+        Blocking.exec {
+          new DbBootStrapService().initDb()
         }
       }
+    }
   }
 
   handlers {
@@ -69,17 +69,27 @@ ratpack {
         }
       }
       get {
-        unitsService.getUnits().then { u ->
-          response.contentType("application/json")
-          response.send(toJson(u))
+      /*  Units.withNewSession {
+          Units.list().collect { u->
+            [id:u.id,version:u.version,name:u.unit]
+          }
+        } then { unitsList ->
+         response.contentType("application/json")
+          render toJson(unitsList)
         }
-        response.status(400)
-      }
+      }*/
+          unitsService.getUnitsAsJson().then { u ->
+              response.contentType("application/json")
+              response.send(u)
+          }
+
+          response.status(400)
+        }
       }
     }
     get("units") {
-      UnitsService.getUnits().collect { u ->
-        [id:u.id,version:u.version,unit:u.unit]
+      UnitsService.getUnits().then { u ->
+        //[id:u.id,version:u.version,unit:u.unit]
         println u
       }
 
