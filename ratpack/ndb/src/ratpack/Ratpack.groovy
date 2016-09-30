@@ -4,18 +4,16 @@ import static ratpack.groovy.Groovy.groovyMarkupTemplate
 import static ratpack.groovy.Groovy.ratpack
 import static groovy.json.JsonOutput.toJson
 import ratpack.exec.Blocking
-/*import ratpack.hikari.HikariModule
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;*/
 import ratpack.service.Service
 import ratpack.service.StartEvent
 import grails.orm.bootstrap.HibernateDatastoreSpringInitializer
 import gov.usda.nal.ndb.model.Units
+import gov.usda.nal.ndb.services.UnitsService
+import gov.usda.nal.ndb.services.DefaultUnitsService
 import gov.usda.nal.ndb.model.FoodGroups
-import gov.usda.nal.ndb.UnitsService
-import gov.usda.nal.ndb.model.Units
-import gov.usda.nal.ndb.DefaultUnitsService
-import gov.usda.nal.ndb.DbBootStrapService
+import gov.usda.nal.ndb.services.FoodGroupsService
+import gov.usda.nal.ndb.services.DefaultFoodGroupsService
+import gov.usda.nal.ndb.services.DbBootStrapService
 import groovy.json.JsonSlurper
 import app.ApplicationConfig
 import app.modules.GormModule
@@ -41,6 +39,7 @@ ratpack {
     // add GORM to the Registry
     moduleConfig(GormModule,appConfig)
     bindInstance UnitsService, new DefaultUnitsService()
+    bindInstance FoodGroupsService, new DefaultFoodGroupsService()
 
     bindInstance JsonSlurper, new JsonSlurper()
     bind DbBootStrapService
@@ -55,7 +54,7 @@ ratpack {
   }
 
   handlers {
-    path('api') {JsonSlurper jsonSlurper, UnitsService unitsService ->
+    path('api') {JsonSlurper jsonSlurper, FoodGroupsService foodGroupsService,UnitsService unitsService ->
       byMethod {
         post {
           request.body.map {body ->
@@ -63,37 +62,42 @@ ratpack {
         }.map { data->
           new Units(data)
         }.flatMap { unit ->
-          UnitsService.save(unit)
-        }.then {
-          response.send()
+          unitsService.save(unit)
+        }.then { m ->
+          response.contentType("application/json")
+          response.send(m)
         }
       }
-      get {
-      /*  Units.withNewSession {
-          Units.list().collect { u->
-            [id:u.id,version:u.version,name:u.unit]
-          }
-        } then { unitsList ->
-         response.contentType("application/json")
-          render toJson(unitsList)
-        }
-      }*/
+      get("units") {
           unitsService.getUnitsAsJson().then { u ->
               response.contentType("application/json")
               response.send(u)
           }
-
           response.status(400)
         }
+        get("foodgroups") {
+            foodGroupsService.getFoodGroupsAsJson().then { f ->
+                response.contentType("application/json")
+                response.send(f)
+            }
+            response.status(400)
+          }
       }
     }
-    get("units") {
-      UnitsService.getUnits().then { u ->
-        //[id:u.id,version:u.version,unit:u.unit]
-        println u
+    get("units") { UnitsService unitsService ->
+      unitsService.getUnitsAsJson().then { u ->
+          response.contentType("application/json")
+          response.send(u)
       }
-
+      response.status(400)
     }
+    get("foodgroups") { FoodGroupsService foodGroupsService ->
+        foodGroupsService.getFoodGroupsAsJson().then { f ->
+            response.contentType("application/json")
+            response.send(f)
+        }
+        response.status(400)
+      }
     get("config")
     {
       ApplicationConfig config ->
