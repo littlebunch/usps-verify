@@ -33,4 +33,6 @@ dependencies {
   compile('org.grails:grails-datastore-gorm-hibernate4:5.0.10.RELEASE') {
     exclude module: 'groovy '
   }
+  compile('commons-httpclient:commons-httpclient:3.1'
+)
 }
