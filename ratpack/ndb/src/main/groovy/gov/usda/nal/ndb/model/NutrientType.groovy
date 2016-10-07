@@ -26,13 +26,14 @@ package gov.usda.nal.ndb.model
 
 import java.util.Date;
 import java.sql.Timestamp;
+import grails.gorm.annotation.Entity
 import app.RatpackGormEntity
 
 /**
  * @version $Id: NutrientType.groovy 1472 2011-05-25 20:33:48Z  $
  * @author gmoore
  */
-
+@Entity
 class NutrientType implements  RatpackGormEntity<NutrientType>{
 	String type
 	Date lastUpdated

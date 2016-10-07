@@ -4,9 +4,11 @@ package gov.usda.nal.ndb.model
  * @author Gary.Moore
  *
  */
-
+import grails.gorm.annotation.Entity
  import app.RatpackGormEntity
+ @Entity
 class Ingredients implements  RatpackGormEntity<Ingredients> {
+  Long id,version
 	Date available	//	The date the data for the food item represented by the specific GTIN was made available on the market.
 	Date discontinued //	The data indicated by the manufacturer that the product represented by a specific GTIN has been discontinued
 	Date updated  //The date the manufacturer last updated the data represented by the specific GTIN.

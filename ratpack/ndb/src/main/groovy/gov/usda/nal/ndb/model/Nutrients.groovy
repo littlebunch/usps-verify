@@ -26,6 +26,8 @@ package gov.usda.nal.ndb.model
 
 import java.util.Date
 import java.sql.Timestamp
+import org.grails.datastore.gorm.GormEntity
+import grails.gorm.annotation.Entity
 import app.RatpackGormEntity
 
 /**
@@ -34,8 +36,9 @@ import app.RatpackGormEntity
 * @version $Id: Nutrients.groovy 1541 2011-06-07 16:50:49Z  $
 */
 
-
-class Nutrients implements RatpackGormEntity<Nutrients>{
+@Entity
+class Nutrients implements GormEntity<Nutrients>{
+	Long id,version
 	String nutrientNo
 	String tagName
 	String description

@@ -26,6 +26,7 @@ package gov.usda.nal.ndb.model
 
 import java.util.Date;
 import java.sql.Timestamp;
+import grails.gorm.annotation.Entity
 import app.RatpackGormEntity
 /**
  * @version $Id: Langual.groovy 1543 2011-06-07 21:09:32Z  $
@@ -33,8 +34,9 @@ import app.RatpackGormEntity
  */
 
 
-
+@Entity
 class Langual implements  RatpackGormEntity<Langual>{
+	Long id,version
 	String code
 	String description
 	Date lastUpdated

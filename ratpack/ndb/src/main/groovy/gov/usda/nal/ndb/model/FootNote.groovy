@@ -30,8 +30,9 @@ package gov.usda.nal.ndb.model
 
 import java.util.Date;
 import java.sql.Timestamp;
+import grails.gorm.annotation.Entity
 import app.RatpackGormEntity
-
+@Entity
 class FootNote implements  RatpackGormEntity<FootNote>{
 	Long id,version
 	String fnId

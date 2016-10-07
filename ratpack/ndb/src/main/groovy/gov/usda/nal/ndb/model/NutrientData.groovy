@@ -23,31 +23,53 @@
 *===========================================================================
 */
 package gov.usda.nal.ndb.model
+
 /**
- * @version $Id: Weights.groovy 1456 2011-05-24 11:36:00Z  $
- * @author gmoore
- *
- */
+* @author gmoore
+* @version $Id: NutrientData.groovy 1926 2011-10-06 18:40:06Z  $
+*/
 
 import java.util.Date;
 import java.sql.Timestamp;
+import org.grails.datastore.gorm.GormEntity
 import grails.gorm.annotation.Entity
 import app.RatpackGormEntity
 @Entity
-class Weights implements RatpackGormEntity<Weights> {
-	Long id,version
-	Integer seq
-	Double amount
-	String description
-	Double gramWeight
+class NutrientData implements GormEntity<NutrientData> {
+	Double value
 	Integer dataPoints
-	Double stdDeviation
+	Double standardError
+	String addNutMark
+	Integer numberStudies
+	Double minimum
+	Double maximum
+	Double degreesFreedom
+	Double lowerEB
+	Double upperEB
+	String comment
+	String confidenceCode
+	Date lastModified
+	SourceCode source
+	Derivation derivation
+	Foods refNDB
+	Foods food
+	Nutrients nutrient
 	Date lastUpdated
-	static belongsTo=[Foods]
-    static constraints = {
+
+	//static belongsTo=[source:SourceCode,derivation:Derivation,refNDB:Foods,food:Foods,nutrient:Nutrients]
+	static constraints = {
+		value nullable:false
+		dataPoints nullable:false
+		refNDB nullable:true,blank:true
+		maximum nullable:true ,blank:true
+		minimum nullable:true ,blank:true
+
 
     }
-
 	static mapping = {
+		addNutMark sqlType:"VARCHAR(2)"
+		comment sqlType:"VARCHAR(20)"
+		confidenceCode sqlType:"VARCHAR(1)"
+
 	}
 }

@@ -23,31 +23,30 @@
 *===========================================================================
 */
 package gov.usda.nal.ndb.model
-/**
- * @version $Id: Weights.groovy 1456 2011-05-24 11:36:00Z  $
- * @author gmoore
- *
- */
-
 import java.util.Date;
 import java.sql.Timestamp;
+import org.grails.datastore.gorm.GormEntity
 import grails.gorm.annotation.Entity
 import app.RatpackGormEntity
+/**
+ * @version $Id: Derivation.groovy 1503 2011-05-27 20:09:36Z  $
+ * @author gmoore
+ */
+
 @Entity
-class Weights implements RatpackGormEntity<Weights> {
-	Long id,version
-	Integer seq
-	Double amount
+class Derivation implements GormEntity<Derivation> {
+	String code
 	String description
-	Double gramWeight
-	Integer dataPoints
-	Double stdDeviation
 	Date lastUpdated
-	static belongsTo=[Foods]
+
     static constraints = {
+		code blank:false,nullable:false
+		description blank:false,nullable:false
 
     }
-
 	static mapping = {
+		code sqlType:"VARCHAR(8)",index:"derv_idx"
+		description sqlType:"VARCHAR(150)"
+
 	}
 }

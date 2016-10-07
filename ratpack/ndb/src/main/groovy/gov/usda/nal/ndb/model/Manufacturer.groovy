@@ -32,7 +32,11 @@ package gov.usda.nal.ndb.model
 import java.util.Date
 import java.sql.Timestamp
 import app.RatpackGormEntity
+import gov.usda.nal.ndb.model.Foods
+import grails.gorm.annotation.Entity
+@Entity
 class Manufacturer implements  RatpackGormEntity<Manufacturer> {
+	Long id,version
 	String name
 	Date lastUpdated
 	static hasMany=[foods:Foods]

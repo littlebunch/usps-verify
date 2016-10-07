@@ -23,7 +23,8 @@
 *===========================================================================
 */
 package gov.usda.nal.ndb.model
-
+import org.grails.datastore.gorm.GormEntity
+import grails.gorm.annotation.Entity
 import app.RatpackGormEntity
 import java.util.Date;
 import java.sql.Timestamp;
@@ -34,8 +35,8 @@ import gov.usda.nal.ndb.Source
 * @author gmoore
 * @version $Id: Foods.groovy 1836 2011-09-01 20:35:37Z  $
 */
-
-class Foods implements  RatpackGormEntity<Foods> {
+@Entity
+class Foods implements  GormEntity<Foods> {
 	Long id
   Long version
 	String ndbNo
@@ -51,11 +52,10 @@ class Foods implements  RatpackGormEntity<Foods> {
 	Double fatFactor
 	Double choFactor
 	Date lastUpdated
-
 	static hasOne = [ingredients:Ingredients]
 	static belongsTo = [fdGroup:FoodGroups,manufacturer:Manufacturer]
 	static hasMany=[langual:Langual,
-					footnotes:FootNote,
+					/*footnotes:FootNote,*/
 					weights:Weights]
 	Boolean survey
 
@@ -73,6 +73,9 @@ class Foods implements  RatpackGormEntity<Foods> {
 		refuseDescription sqlType:"VARCHAR(255)"
 		scientificName sqlType:"VARCHAR(100)"
 		source(enumType: "string")
+		fdGroup lazy:false
+		weights lazy:false
+		manufacturer lazy:false
 
 	}
 	/**
