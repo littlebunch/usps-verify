@@ -3,7 +3,6 @@ import ratpack.server.Service
 import ratpack.server.StartEvent
 import ratpack.server.StopEvent
 import gov.usda.nal.ndb.model.Units
-import gov.usda.nal.ndb.model.User
 import gov.usda.nal.ndb.model.FoodGroups
 /**
 * Use this to perform any database bootstraping.
@@ -13,7 +12,6 @@ class DbBootStrapService implements Service {
   void initDb() {
     initUnits()
     initFoodGroups()
-    initUsers()
   }
   void initUnits() {
         Units.withNewSession {
@@ -29,10 +27,5 @@ class DbBootStrapService implements Service {
       FoodGroups.findOrSaveWhere(cd:'4500',description:'Branded Food Products')
     }
   }
-  void initUsers()
-  {
-    User.withNewSession {
-      User.findOrSaveWhere(name:'Gary Moore',email:'gary@littlebunch.com',version:1L)
-    }
-  }
+
 }
