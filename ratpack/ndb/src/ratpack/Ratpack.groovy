@@ -13,6 +13,9 @@ import gov.usda.nal.ndb.services.DefaultUnitsService
 import gov.usda.nal.ndb.model.FoodGroups
 import gov.usda.nal.ndb.services.FoodGroupsService
 import gov.usda.nal.ndb.services.DefaultFoodGroupsService
+import gov.usda.nal.ndb.model.Foods
+import gov.usda.nal.ndb.services.FoodService
+import gov.usda.nal.ndb.services.DefaultFoodService
 import gov.usda.nal.ndb.services.DbBootStrapService
 import groovy.json.JsonSlurper
 import app.ApplicationConfig
@@ -40,7 +43,7 @@ ratpack {
     moduleConfig(GormModule,appConfig)
     bindInstance UnitsService, new DefaultUnitsService()
     bindInstance FoodGroupsService, new DefaultFoodGroupsService()
-
+    bindInstance FoodService, new DefaultFoodService()
     bindInstance JsonSlurper, new JsonSlurper()
     bind DbBootStrapService
     bindInstance new Service() {
@@ -82,22 +85,35 @@ ratpack {
             }
             response.status(400)
           }
+
       }
     }
     get("units") { UnitsService unitsService ->
-      unitsService.getUnitsAsJson().then { u ->
-          response.contentType("application/json")
-          response.send(u)
+      Blocking.get {
+        unitsService.getUnitsAsJson()
+      } then { u ->
+          render(u)
       }
       response.status(400)
     }
     get("foodgroups") { FoodGroupsService foodGroupsService ->
-        foodGroupsService.getFoodGroupsAsJson().then { f ->
-            response.contentType("application/json")
-            response.send(f)
+      Blocking.get {
+        foodGroupsService.getFoodGroupsAsJson() } then { f ->
+            render(f)
         }
         response.status(400)
       }
+    get("food") {JsonSlurper jsonSlurper, FoodService foodService ->
+        request.body.map {body ->
+          jsonSlurper.parseText(body.text) as Map
+      }.map { data->
+          foodService.getFoodAsJson(data.ndbno)
+      }.then { f ->
+          render(f)
+        }
+        //response.contentType("application/json")
+        //response.send(f)
+    }
     get("config")
     {
       ApplicationConfig config ->
