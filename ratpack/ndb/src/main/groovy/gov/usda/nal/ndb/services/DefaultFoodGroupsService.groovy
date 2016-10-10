@@ -3,14 +3,14 @@ import groovy.json.JsonBuilder
 import ratpack.exec.Promise
 import ratpack.exec.Operation
 import ratpack.exec.Blocking
-//import org.apache.commons.httpclient.HttpStatus
+import org.apache.commons.httpclient.HttpStatus
 import gov.usda.nal.ndb.model.FoodGroups
 class DefaultFoodGroupsService implements FoodGroupsService {
 @Override
 Promise<String> save(FoodGroups f)
   {
     def r="saved",
-    s=200 //HttpStatus.SC_OK
+    s=HttpStatus.SC_OK
     FoodGroups.withNewSession {
       f.validate()
       if ( f.hasErrors()) {
