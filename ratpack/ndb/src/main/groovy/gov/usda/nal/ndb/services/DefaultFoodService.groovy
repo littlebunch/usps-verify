@@ -4,7 +4,7 @@ import ratpack.exec.Promise
 import ratpack.exec.Operation
 import ratpack.exec.Blocking
 import org.springframework.transaction.annotation.*
-//import org.apache.commons.httpclient.HttpStatus
+import org.apache.commons.httpclient.HttpStatus
 import gov.usda.nal.ndb.model.Foods
 import gov.usda.nal.ndb.model.FoodGroups
 import gov.usda.nal.ndb.model.NutrientData
@@ -13,7 +13,7 @@ class DefaultFoodService implements FoodService {
 Promise<String> save(Foods f)
   {
     def r="saved",
-    s=200 //HttpStatus.SC_OK
+    s=HttpStatus.SC_OK
     Foods.withNewSession {
       f.validate()
       if ( f.hasErrors()) {
