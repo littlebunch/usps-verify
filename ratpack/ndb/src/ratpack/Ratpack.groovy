@@ -8,15 +8,11 @@ import ratpack.service.Service
 import ratpack.service.StartEvent
 import grails.orm.bootstrap.HibernateDatastoreSpringInitializer
 import gov.usda.nal.ndb.model.Units
-import gov.usda.nal.ndb.services.UnitsService
-import gov.usda.nal.ndb.services.DefaultUnitsService
 import gov.usda.nal.ndb.model.FoodGroups
-import gov.usda.nal.ndb.services.FoodGroupsService
-import gov.usda.nal.ndb.services.DefaultFoodGroupsService
 import gov.usda.nal.ndb.model.Foods
-import gov.usda.nal.ndb.services.FoodService
-import gov.usda.nal.ndb.services.DefaultFoodService
 import gov.usda.nal.ndb.services.DbBootStrapService
+import gov.usda.nal.ndb.services.ModelService
+import gov.usda.nal.ndb.services.DefaultModelService
 import groovy.json.JsonSlurper
 import app.ApplicationConfig
 import app.modules.GormModule
@@ -41,9 +37,8 @@ ratpack {
     module MarkupTemplateModule
     // add GORM to the Registry
     moduleConfig(GormModule,appConfig)
-    bindInstance UnitsService, new DefaultUnitsService()
-    bindInstance FoodGroupsService, new DefaultFoodGroupsService()
-    bindInstance FoodService, new DefaultFoodService()
+
+    bindInstance ModelService, new DefaultModelService()
     bindInstance JsonSlurper, new JsonSlurper()
     bind DbBootStrapService
     bindInstance new Service() {
@@ -57,7 +52,7 @@ ratpack {
   }
 
   handlers {
-    path('api') {JsonSlurper jsonSlurper, FoodGroupsService foodGroupsService,UnitsService unitsService ->
+    path('api') {JsonSlurper jsonSlurper, ModelService modelService ->
       byMethod {
         post {
           request.body.map {body ->
@@ -65,21 +60,21 @@ ratpack {
         }.map { data->
           new Units(data)
         }.flatMap { unit ->
-          unitsService.save(unit)
+          modelService.save(unit)
         }.then { m ->
           response.contentType("application/json")
           response.send(m)
         }
       }
       get("units") {
-          unitsService.getUnitsAsJson().then { u ->
+          modelService.getUnitsAsJson().then { u ->
               response.contentType("application/json")
               response.send(u)
           }
           response.status(400)
         }
         get("foodgroups") {
-            foodGroupsService.getFoodGroupsAsJson().then { f ->
+            modelService.getFoodGroupsAsJson().then { f ->
                 response.contentType("application/json")
                 response.send(f)
             }
@@ -88,31 +83,36 @@ ratpack {
 
       }
     }
-    get("units") { UnitsService unitsService ->
+    get("units") { ModelService modelService ->
       Blocking.get {
-        unitsService.getUnitsAsJson()
+        modelService.getUnitsAsJson()
       } then { u ->
           render(u)
       }
       response.status(400)
     }
-    get("foodgroups") { FoodGroupsService foodGroupsService ->
+    get("foodgroups") { ModelService modelService ->
       Blocking.get {
-        foodGroupsService.getFoodGroupsAsJson() } then { f ->
+        modelService.getFoodGroupsAsJson() } then { f ->
             render(f)
         }
         response.status(400)
       }
-    get("food") {JsonSlurper jsonSlurper, FoodService foodService ->
-        request.body.map {body ->
-          jsonSlurper.parseText(body.text) as Map
-      }.map { data->
-          foodService.getFoodAsJson(data.ndbno)
-      }.then { f ->
-          render(f)
+    get("food") {JsonSlurper jsonSlurper, ModelService modelService ->
+      byContent {
+        json {
+          request.body.map {body ->
+              jsonSlurper.parseText(body.text) as Map
+          }.map { data->
+              modelService.getFoodAsJson(data.ndbno)
+          }.then { f ->
+              render(f)
+          }
         }
-        //response.contentType("application/json")
-        //response.send(f)
+        html {
+          render(modelService.getFoodAsJson(request.queryParams.ndbno?:"9999999"))
+        }
+      }
     }
     get("config")
     {
