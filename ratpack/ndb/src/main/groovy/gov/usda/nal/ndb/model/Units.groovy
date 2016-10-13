@@ -41,6 +41,6 @@ class Units implements GormEntity<Units> {
 	Date lastUpdated
 	static hasMany=[nutrients:Nutrients]
     static constraints = {
-			unit blank:false
+			unit blank:false,unique:true
     }
 }
