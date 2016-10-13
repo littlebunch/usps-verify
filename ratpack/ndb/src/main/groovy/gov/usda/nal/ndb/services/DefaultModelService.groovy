@@ -18,39 +18,25 @@ Promise<String> save(Object o)
     s=HttpStatus.SC_OK
     switch(o)
     {
-      case o instanceof Units:
-        Units.withNewSession {
+      case FoodGroups:
+      case Foods:
+      case Units:
+        o.withNewSession {
           o.validate()
           if ( o.hasErrors()) {
             o.errors.allErrors().each{
               r+=it
             }
+          } else
+          {
+            o.save(flush:true)
           }
-          o.save()
         }
       break
-      case o instanceof FoodGroups:
-        Foods.withNewSession {
-          o.validate()
-          if ( o.hasErrors()) {
-            o.errors.allErrors().each{
-              r+=it
-            }
-          }
-          o.save()
-        }
+      default:
+        r="Unrecognized object type"
       break
-      case o instanceof Foods:
-        Foods.withNewSession {
-          o.validate()
-          if ( o.hasErrors()) {
-            o.errors.allErrors().each{
-              r+=it
-            }
-          }
-          o.save()
-        }
-      break
+
   }
     Promise.sync{'{"status":'+s+',"msg":"'+r+'"}'}
   }
@@ -90,12 +76,11 @@ Promise<String> save(Object o)
   Promise<String> getFoodAsJson(String ndbno)
   {
     def j=new JsonBuilder()
-    Blocking.exec {
       Foods.withNewSession {
         def f=Foods.findWhere(ndbNo:ndbno)
-        def n=NutrientData.findAllWhere(food:f)
         j {
           if ( f ) {
+              def n=NutrientData.findAllWhere(food:f)
               food([ndbNo:ndbno,description:f.description,source:f.source,
                     shortdescript:f.shortDescription,
                     scientificName:f.scientificName,
@@ -121,7 +106,6 @@ Promise<String> save(Object o)
           }
           }
       }
-    }
     Promise.sync{ j.toString()}
   }
 //  @Override
