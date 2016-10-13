@@ -15,11 +15,11 @@ class DbBootStrapService implements Service {
   }
   void initUnits() {
         Units.withNewSession {
-          Units.findOrSaveWhere(unit:'g',version:1L)
-          Units.findOrSaveWhere(unit:'lb',version:1L)
-          Units.findOrSaveWhere(unit:'gal',version:1L)
-          Units.findOrSaveWhere(unit:'ml',version:1L )
-          Units.findOrSaveWhere(unit:'ton',version:1L)
+          Units.findOrSaveWhere(unit:'g')
+          Units.findOrSaveWhere(unit:'lb')
+          Units.findOrSaveWhere(unit:'gal')
+          Units.findOrSaveWhere(unit:'ml' )
+          Units.findOrSaveWhere(unit:'ton')
       }
   }
   void initFoodGroups() {
