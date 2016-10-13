@@ -6,6 +6,8 @@ import static groovy.json.JsonOutput.toJson
 import ratpack.exec.Blocking
 import ratpack.service.Service
 import ratpack.service.StartEvent
+import ratpack.ssl.SSLContexts
+import java.nio.file.Paths
 import grails.orm.bootstrap.HibernateDatastoreSpringInitializer
 import gov.usda.nal.ndb.model.Units
 import gov.usda.nal.ndb.model.FoodGroups
@@ -24,6 +26,7 @@ ratpack {
     env()
     sysProps()
     require("",ApplicationConfig)
+    ssl SSLContexts.sslContext(Paths.get("/etc/server.jks"),"changeit")
   }
   bindings {
     // load our application config from the serverConfig for use in bindings
@@ -52,65 +55,65 @@ ratpack {
   }
 
   handlers {
-    path('api') {JsonSlurper jsonSlurper, ModelService modelService ->
+    path('api/units') {JsonSlurper jsonSlurper, ModelService modelService ->
       byMethod {
         post {
           request.body.map {body ->
             jsonSlurper.parseText(body.text) as Map
-        }.map { data->
-          new Units(data)
-        }.flatMap { unit ->
-          modelService.save(unit)
-        }.then { m ->
-          response.contentType("application/json")
-          response.send(m)
-        }
-      }
-      get("units") {
-          modelService.getUnitsAsJson().then { u ->
-              response.contentType("application/json")
-              response.send(u)
+          }.map { data->
+            new Units(data)
+          }.flatMap { unit ->
+            Blocking.get {
+              modelService.save(unit)
+          }} then { m ->
+            response.contentType("application/json")
+            render(m)
           }
-          response.status(400)
         }
-        get("foodgroups") {
-            modelService.getFoodGroupsAsJson().then { f ->
-                response.contentType("application/json")
-                response.send(f)
+        get {
+          Blocking.get {
+            modelService.getUnitsAsJson() }then { u ->
+              response.contentType("application/json")
+              render(u)
             }
             response.status(400)
-          }
-
+        }
       }
     }
-    get("units") { ModelService modelService ->
-      Blocking.get {
-        modelService.getUnitsAsJson()
-      } then { u ->
-          render(u)
+    path('api/foodgroups') { ModelService modelService ->
+      byMethod {
+        get{
+            Blocking.get {
+              modelService.getFoodGroupsAsJson() } then { f ->
+                response.contentType("application/json")
+                render(f)
+              }
+          response.status(400)
+        }
       }
-      response.status(400)
     }
-    get("foodgroups") { ModelService modelService ->
-      Blocking.get {
-        modelService.getFoodGroupsAsJson() } then { f ->
-            render(f)
-        }
-        response.status(400)
-      }
-    get("food") {JsonSlurper jsonSlurper, ModelService modelService ->
-      byContent {
-        json {
-          request.body.map {body ->
-              jsonSlurper.parseText(body.text) as Map
-          }.map { data->
-              modelService.getFoodAsJson(data.ndbno)
-          }.then { f ->
-              render(f)
+    path('api/food') { JsonSlurper jsonSlurper, ModelService modelService ->
+      byMethod {
+        get {
+          byContent {
+            json {
+              request.body.map {body ->
+                  jsonSlurper.parseText(body.text) as Map
+              }.map { data->
+                Blocking.get {
+                  modelService.getFoodAsJson(data.ndbno)
+              }} then { f ->
+                  response.contentType("application/json")
+                  render(f)
+              }
+            }
+            html {
+              render(
+                Blocking.get{
+                  modelService.getFoodAsJson(request.queryParams.ndbno?:"9999999")
+                })
+            }
           }
-        }
-        html {
-          render(modelService.getFoodAsJson(request.queryParams.ndbno?:"9999999"))
         }
       }
     }
