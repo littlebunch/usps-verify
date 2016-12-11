@@ -73,15 +73,16 @@ Promise<String> save(Object o)
       Promise.sync{f}
   }
   //@Override
-  Promise<String> getFoodAsJson(String ndbno)
+  Promise<String> getFoodAsJson(List ndbno)
   {
     def j=new JsonBuilder()
       Foods.withNewSession {
-        def f=Foods.findWhere(ndbNo:ndbno)
         j {
+          foods: ndbno.collect { nid ->
+          def f=Foods.findWhere(ndbNo:nid)
           if ( f ) {
               def n=NutrientData.findAllWhere(food:f)
-              food([ndbNo:ndbno,description:f.description,source:f.source,
+              food([ndbNo:nid,description:f.description,source:f.source,
                     shortdescript:f.shortDescription,
                     scientificName:f.scientificName,
                     commercialName:f.commercialName,
@@ -94,17 +95,37 @@ Promise<String> save(Object o)
                     group:f.fdGroup.description,
                     manu:f.manufacturer.name,
                     ingredients:['desc':f.ingredients?.description],
+                    footnotes: f.footnotes.collect{fn->
+                      ['id':fn.fnId!=null?fn.fnId:'','desc':fn.fnText!=null?fn.fnText:'']
+					          }.unique().sort(),
                     measures: f.weights.collect{ m ->
                         					[id:m.id,label:m.description,eqv:m.gramWeight,qty:m.amount,seq:m.seq]
-  				                     },
+  				          },
                     nutrients: n.collect{ d->
-                                  [nutrientNo:d.nutrient.nutrientNo,nutrient:d.nutrient.description,value:d.value]
-                                }
+                      /*Integer dataPoints
+                      Double standardError
+                      String addNutMark
+                      Integer numberStudies
+                      Double minimum
+                      Double maximum
+                      Double degreesFreedom
+                      Double lowerEB
+                      Double upperEB
+                      String comment
+                      String confidenceCode
+                      Date lastModified
+                      SourceCode source
+                      Derivation derivation*/
+                          [nutrientNo:d.nutrient.nutrientNo,nutrient:d.nutrient.description,value:d.value,dp:d.dataPoints,
+                          se:d.standardError,studies:d.numberStudies,min:d.minimum,max:d.maximum,lb:d.lowerEB,ub:d.upperEB,
+                          comment:d.comment,confidenceCode:d.confidenceCode,source:[code:d.source.code,desc:d.source.description]]
+                    }
                   ])
           } else {
             food([ndbNo:ndbno,description:"Not Found"])
           }
-          }
+        }
+         }
       }
     Promise.sync{ j.toString()}
   }

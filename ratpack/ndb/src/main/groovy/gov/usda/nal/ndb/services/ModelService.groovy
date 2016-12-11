@@ -10,5 +10,5 @@ interface ModelService {
     Promise<List<Foods>>getFood(String ndb)
     Promise<String>getUnitsAsJson()
     Promise<String>getFoodGroupsAsJson()
-    Promise<String>getFoodAsJson(String ndb)
+    Promise<String>getFoodAsJson(List ndbno)
 }
