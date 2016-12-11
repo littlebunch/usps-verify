@@ -55,7 +55,7 @@ class Foods implements  GormEntity<Foods> {
 	static hasOne = [ingredients:Ingredients]
 	static belongsTo = [fdGroup:FoodGroups,manufacturer:Manufacturer]
 	static hasMany=[langual:Langual,
-					/*footnotes:FootNote,*/
+					footnotes:FootNote,
 					weights:Weights]
 	Boolean survey
 
