@@ -1,4 +1,6 @@
 import ratpack.groovy.template.MarkupTemplateModule
+import ratpack.error.ServerErrorHandler
+import ratpack.handling.Context
 import javax.sql.DataSource
 import static ratpack.groovy.Groovy.groovyMarkupTemplate
 import static ratpack.groovy.Groovy.ratpack
@@ -40,7 +42,18 @@ ratpack {
     module MarkupTemplateModule
     // add GORM to the Registry
     moduleConfig(GormModule,appConfig)
-
+    bindInstance ServerErrorHandler, new ServerErrorHandler() {
+        @Override
+        void error(Context ctx,Throwable t) throws Exception {
+          def e="Sever error"
+          println "t=${t}"
+          ctx.response.status(500)
+          if (t instanceof groovy.json.JsonException)
+              e="JSON Parse Error"
+          ctx.response.contentType("application/json")
+          ctx.render('{"error":"'+e+'"}')
+        }
+    }
     bindInstance ModelService, new DefaultModelService()
     bindInstance JsonSlurper, new JsonSlurper()
     bind DbBootStrapService
@@ -65,10 +78,10 @@ ratpack {
           }.flatMap { unit ->
             Blocking.get {
               modelService.save(unit)
-          }} then { m ->
+          }.then { m ->
             response.contentType("application/json")
             render(m)
-          }
+          }}
         }
         get {
           Blocking.get {
@@ -100,6 +113,7 @@ ratpack {
               request.body.map {body ->
                   jsonSlurper.parseText(body.text) as Map
               }.map { data->
+                println "data=${data}"
                 Blocking.get {
                   modelService.getFoodAsJson(data.ndbno)
               }} then { f ->
@@ -108,10 +122,11 @@ ratpack {
               }
             }
             html {
-              render(
-                Blocking.get{
-                  modelService.getFoodAsJson(request.queryParams.ndbno?:"9999999")
-                })
+              Blocking.get{
+                modelService.getFoodAsJson(request.queryParams.ndbno?:"9999999")
+              } then { f->
+                  render(f)
+                }
             }
           }
         }
