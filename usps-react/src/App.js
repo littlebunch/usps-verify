@@ -14,7 +14,7 @@ function App() {
       className="zip"
       value={zipcode}
       placeholder="XXXXX"
-      type={text}
+      type="text"
       name="zip"
       id="zip"
       onChange={(event) => {
