@@ -77,4 +77,4 @@ pre {
 .loader::after {
   animation: around 0.7s ease-in-out 0.1s infinite;
   background: transparent;
-}
+} 
