@@ -4,15 +4,14 @@
   flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
-  background-color: rgb(190, 179, 190);
+  background-color: white;
   height: 100vh;
 }
 h1 {
   margin-bottom: 30px;
 }
 .form-data {
-  display: flex;
-  flex-flow: column;
+  
   width: fit-content;
   align-items: center;
   justify-content: center;
