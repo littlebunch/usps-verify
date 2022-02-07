@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+//import { css } from '@emotion/react';
 type InputProp = {
   width: string
 }
@@ -10,9 +10,10 @@ export const Fieldset = styled.fieldset`
   margin: 10px auto 0 auto;
   padding: 30px;
   width: 90%;
-  background-color: '#f7f8fa';
+  background-color: #f7f8fa;
   border-radius: 4px;
-  border: 1px solid '#e3e2e2';
+  border: 1px solid #e3e2e2;
+  color: #212529;
   box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.16);
 `;
 export const ActionButton = styled.button<ButtonProp>`
@@ -48,16 +49,18 @@ export const ActionButton = styled.button<ButtonProp>`
       props.width };
   `;
   export const FieldLabel = styled.label`
-  font-weight: bold;
+  font-weight: 500;
   font-size: 1.2rem;`;
 
   export const SubmissionSuccess = styled.div`
   margin-top: 10px;
-  color: green;
+  color: #3875a4;
+  font-weight:bold;
 `;
 export const SubmissionFailure = styled.div`
   margin-top: 10px;
   color: red;
+  font-weight: bold;
 `;
 export const FieldError = styled.div`
   font-size: 12px;

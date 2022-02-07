@@ -1,17 +1,10 @@
 
 import React, { useState, useEffect } from "react";
-import { ObjectType, ObjectTypeDeclaration } from "typescript";
+//import { ObjectType, ObjectTypeDeclaration } from "typescript";
 import { useForm } from 'react-hook-form';
 import "./App.css";
 import {FieldLabel,FieldError,Fieldset,FieldInput,ActionButton,SubmissionSuccess,SubmissionFailure} from './Styles';
 
-type FormData = {
-    address1: string,
-    address2: string,
-    zipcode: string,
-    city: string,
-    state: string,
-  };
 const xml2json = (srcDOM: any) => {
   var jsonResult: any = {};
   
@@ -48,20 +41,23 @@ export const Address = () => {
   const [cityState, setCityState] = useState(initialCityState);
   const [zipcode, setZipcode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [zip4,setZip4] = useState("");
   const isZipValid = zipcode.length === 5 && zipcode;
   const parser = new DOMParser();
   const [successfullySubmitted, setSuccessfullySubmitted] =
   React.useState(false);
   const [unsuccessfullySubmitted, setUnsuccessfullySubmitted] =
   React.useState(false);
-  const {handleSubmit,formState:{errors}, setError, clearErrors, formState, register,reset } = useForm<FormData>({
+  const {handleSubmit,formState:{errors}, setError, clearErrors, formState, register } = useForm({
     mode: 'onBlur',
 });
   useEffect(() => {
     if ( isZipValid ) {
+        console.log("HELLO");
         fetchCityState();
     }
   },[zipcode]);
+  
 async function fetchCityState ()  {
     try {
         const response = await fetch(
@@ -107,11 +103,11 @@ async function fetchCityState ()  {
         setUnsuccessfullySubmitted(true);
          setSuccessfullySubmitted(false);
     } else {
+        setZip4(res.AddressValidateResponse.Address.Zip4)
         if ( !res.AddressValidateResponse.Address.Address1  ) {
             setAddress1(res.AddressValidateResponse.Address.Address2);
             setAddress2("");
         } else {
-            console.log(res.AddressValidateResponse.Address.Address2);
             setAddress1(res.AddressValidateResponse.Address.Address1);
             setAddress2(res.AddressValidateResponse.Address.Address2);
         }
@@ -164,7 +160,15 @@ async function fetchCityState ()  {
         setZipcode(value.replace(/[^\d{5}]$/,"").substring(0,5));
       }}
       />
-      
+      -
+     <FieldInput
+         value={zip4 || ""}
+         placeholder="XXXX"
+         type="text"
+         id="zip4"
+         width={"50px"}
+         disabled
+         />
       <FieldLabel htmlFor="city">City</FieldLabel>
       <FieldInput
       value={cityState.city}
@@ -191,11 +195,14 @@ async function fetchCityState ()  {
       
     
       <ActionButton type="submit" onClick={()=> clearErrors()}
-      color="#4CAF50">Validate</ActionButton>
-      
-          <ActionButton type='reset'
-          onClick={() => reset()}
-            color="red" >Reset</ActionButton>
+      color="#3875a4">Validate</ActionButton>
+      <ActionButton type='reset'
+          onClick={() => {setAddress1("");
+          setAddress2("");
+          setCityState(initialCityState);
+          setZip4("");
+          setZipcode("")}}
+            color="gray" >Reset</ActionButton>
         {successfullySubmitted && (
             <SubmissionSuccess>
               ADDRESS VALIDATED
